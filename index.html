@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#006A60">
+    <meta name="description" content="RNL Food - Сервис питания для Ришельевского лицея">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>RNL FOOD - Ришельевский лицей</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme" data-theme="light">
+    <!-- Animated Background -->
+    <div class="bg-animation" aria-hidden="true">
+        <div class="bg-gradient"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="bg-orbs">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+    </div>
+
+    <!-- Morphing Shapes -->
+    <div class="morph-shapes" aria-hidden="true">
+        <div class="morph morph-1"></div>
+        <div class="morph morph-2"></div>
+        <div class="morph morph-3"></div>
+    </div>
+
+    <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+    <!-- Loading Screen -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <svg viewBox="0 0 100 100" class="loader-svg">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--primary)" stroke-width="3" stroke-dasharray="283" stroke-dashoffset="0">
+                        <animate attributeName="stroke-dashoffset" from="0" to="283" dur="2s" fill="freeze"/>
+                    </circle>
+                    <text x="50" y="58" font-family="Inter" font-size="24" font-weight="700" fill="var(--primary)" text-anchor="middle">RNL</text>
+                </svg>
+            </div>
+            <div class="loader-text">Загрузка...</div>
+            <div class="loader-progress">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-glow"></div>
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo" onclick="navigate('start')" role="button" tabindex="0" aria-label="На главную">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 50 50">
+                            <defs>
+                                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--primary)"/>
+                                    <stop offset="100%" style="stop-color:var(--secondary)"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="25" cy="25" r="23" fill="url(#logoGrad)"/>
+                            <text x="25" y="30" font-family="Inter" font-size="12" font-weight="700" fill="white" text-anchor="middle">RNL</text>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">RNL Food</span>
+                        <span class="logo-sub">Ришельевский лицей</span>
+                    </div>
+                </div>
+
+                <nav class="nav-desktop" role="navigation">
+                    <button class="nav-link active" data-screen="assortment" onclick="navigate('assortment')">
+                        <i class="fas fa-utensils"></i>
+                        <span>Меню</span>
+                    </button>
+                    <button class="nav-link" data-screen="favorites" onclick="navigate('favorites')">
+                        <i class="fas fa-heart"></i>
+                        <span>Избранное</span>
+                    </button>
+                    <button class="nav-link" data-screen="meal-planner" onclick="navigate('meal-planner')">
+                        <i class="fas fa-calendar-week"></i>
+                        <span>Планировщик</span>
+                    </button>
+                    <button class="nav-link" data-screen="profile" onclick="navigate('profile')">
+                        <i class="fas fa-user"></i>
+                        <span>Профиль</span>
+                    </button>
+                </nav>
+
+                <div class="header-actions">
+                    <button class="action-btn voice-btn" id="voiceBtn" aria-label="Голосовое управление" title="Голосовое управление">
+                        <i class="fas fa-microphone"></i>
+                        <div class="voice-wave">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </button>
+
+                    <button class="action-btn theme-btn" onclick="toggleTheme()" aria-label="Переключить тему" title="Тема">
+                        <i class="fas fa-moon"></i>
+                    </button>
+
+                    <button class="action-btn search-btn" onclick="openSearch()" aria-label="Поиск" title="Поиск">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <button class="action-btn notif-btn" onclick="toggleNotifications()" aria-label="Уведомления" title="Уведомления">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notifBadge" style="display:none">0</span>
+                    </button>
+
+                    <button class="action-btn cart-btn" onclick="toggleCart()" aria-label="Корзина" title="Корзина">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="badge" id="cartBadge">0</span>
+                    </button>
+
+                    <div class="user-menu" id="userMenu">
+                        <button class="user-btn" onclick="toggleUserMenu()">
+                            <div class="user-avatar" id="userAvatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header" id="dropdownHeader">
+                                <div class="dropdown-name" id="dropdownName">Гость</div>
+                            <div class="dropdown-role" id="dropdownRole">Не авторизован</div>
+                            </div>
+                            <button class="dropdown-item" onclick="navigate('profile')">
+                                <i class="fas fa-user-circle"></i> Профиль
+                            </button>
+                            <button class="dropdown-item" onclick="openSessions()">
+                                <i class="fas fa-laptop"></i> Устройства
+                            </button>
+                            <button class="dropdown-item" onclick="showSettings()">
+                                <i class="fas fa-cog"></i> Настройки
+                            </button>
+                            <button class="dropdown-item admin-only" onclick="navigate('admin')" style="display:none">
+                                <i class="fas fa-shield-alt"></i> Админ-панель
+                            </button>
+                            <button class="dropdown-item kitchen-only" onclick="navigate('kitchen')" style="display:none">
+                                <i class="fas fa-utensils"></i> Кухня
+                            </button>
+                            <button class="dropdown-item" id="loginBtn" onclick="navigate('login')">
+                                <i class="fas fa-sign-in-alt"></i> Войти
+                            </button>
+                            <button class="dropdown-item logout-only" id="logoutBtn" onclick="logout()" style="display:none">
+                                <i class="fas fa-sign-out-alt"></i> Выйти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Меню">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+
+        <nav class="nav-mobile" id="navMobile">
+            <button class="nav-item active" data-screen="assortment" onclick="navigate('assortment')">
+                <i class="fas fa-utensils"></i>
+                <span>Меню</span>
+            </button>
+            <button class="nav-item" data-screen="favorites" onclick="navigate('favorites')">
+                <i class="fas fa-heart"></i>
+                <span>Избранное</span>
+            </button>
+            <button class="nav-item" data-screen="cart" onclick="toggleCart()">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Корзина</span>
+                <span class="nav-badge" id="mobileCartBadge">0</span>
+            </button>
+            <button class="nav-item" data-screen="profile" onclick="navigate('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main" id="main">
+        <div class="container">
+            <!-- Start Screen -->
+            <section id="screen-start" class="screen active">
+                <div class="hero compact">
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i class="fas fa-utensils"></i>
+                            RNL Food
+                        </div>
+                        <h1 class="hero-title">
+                            <span class="title-line">ЗАКАЗЫВАЙ ЕДУ</span>
+                            <span class="title-line accent">БЕЗ ОЧЕРЕДЕЙ</span>
+                        </h1>
+                        <p class="hero-subtitle">Быстро • Вкусно • Удобно</p>
+
+                        <div class="hero-actions">
+                            <button class="btn btn-primary btn-lg" onclick="navigate('login')">
+                                <span>Начать заказ</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hero-visual">
+                        <div class="floating-card">
+                            <div class="fc-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="fc-info">
+                                <div class="fc-title">Блюдо дня</div>
+                                <div class="fc-name" id="dailyDish">Куриный суп</div>
+                                <div class="fc-price" id="dailyPrice">25 ₴</div>
+                            </div>
+                            <button class="fc-btn" onclick="addDailyToCart()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                        <h3>Быстро</h3>
+                        <p>30 секунд</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Безопасно</h3>
+                        <p>Защита</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                        <h3>Вкусно</h3>
+                        <p>Свежие продукты</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+                        <h3>Выгодно</h3>
+                        <p>Промокоды</p>
+                    </div>
+                </div>
+
+                <div class="credits">
+                    <p>RNL Food © 2026 • Ришельевский лицей</p>
+                </div>
+            </section>
+
+            <!-- Login Screen -->
+            <section id="screen-login" class="screen">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div class="auth-header">
+                            <div class="auth-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h2>Добро пожаловать</h2>
+                            <p>Войдите в свой аккаунт</p>
+                        </div>
+
+                        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="input-icon fas fa-user"></i>
+                                    <input type="text" id="loginUsername" placeholder=" " required autocomplete="username">
+                                    <label for="loginUsername">Логин</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="input-icon fas fa-lock"></i>
+                                    <input type="password" id="loginPassword" placeholder=" " required autocomplete="current-password">
+                                    <label for="loginPassword">Пароль</label>
+                                    <button type="button" class="toggle-pass" onclick="togglePassword('loginPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-options">
+                                <label class="checkbox-wrapper">
+                                    <input type="checkbox" id="rememberMe">
+                                    <span class="checkmark"></span>
+                                    <span>Запомнить</span>
+                                </label>
+                                <a href="#" class="link" onclick="showForgotPassword()">Забыли?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <span>Войти</span>
+                                <i class="fas fa-sign-in-alt"></i>
+                            </button>
+                        </form>
+
+                        <div class="auth-divider">
+                            <span>или</span>
+                        </div>
+
+                        <button class="btn btn-secondary btn-block" onclick="showRegister()">
+                            <i class="fas fa-user-plus"></i>
+                            Создать аккаунт
+                        </button>
+
+                        <div class="auth-footer">
+                            <p>Продолжая, вы соглашаетесь с <a href="#">условиями</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Register Screen -->
+            <section id="screen-register" class="screen">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div class="auth-header">
+                            <div class="auth-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h2>Регистрация</h2>
+                            <p>Создайте новый аккаунт</p>
+                        </div>
+
+                        <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="input-icon fas fa-user"></i>
+                                    <input type="text" id="regUsername" placeholder=" " required minlength="3" maxlength="20">
+                                    <label for="regUsername">Логин</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="input-icon fas fa-lock"></i>
+                                    <input type="password" id="regPassword" placeholder=" " required minlength="6">
+                                    <label for="regPassword">Пароль</label>
+                                    <button type="button" class="toggle-pass" onclick="togglePassword('regPassword')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-wrapper">
+                                    <i class="input-icon fas fa-user-tag"></i>
+                                    <input type="text" id="regFullname" placeholder=" " required>
+                                    <label for="regFullname">ФИО</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <div class="input-wrapper">
+                                        <select id="regGrade" required>
+                                            <option value="">Класс</option>
+                                            <option value="5-А">5-А</option>
+                                            <option value="5-Б">5-Б</option>
+                                            <option value="6-А">6-А</option>
+                                            <option value="6-Б">6-Б</option>
+                                            <option value="7-А">7-А</option>
+                                            <option value="7-Б">7-Б</option>
+                                            <option value="8-А">8-А</option>
+                                            <option value="8-Б">8-Б</option>
+                                            <option value="9-А">9-А</option>
+                                            <option value="9-Б">9-Б</option>
+                                            <option value="10-А">10-А</option>
+                                            <option value="10-Б">10-Б</option>
+                                            <option value="11-А">11-А</option>
+                                            <option value="11-Б">11-Б</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-wrapper">
+                                        <input type="number" id="regAge" placeholder=" " min="10" max="19">
+                                        <label for="regAge">Возраст</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <span>Зарегистрироваться</span>
+                                <i class="fas fa-user-plus"></i>
+                            </button>
+                        </form>
+
+                        <div class="auth-divider">
+                            <span>уже есть аккаунт?</span>
+                        </div>
+
+                        <button class="btn btn-secondary btn-block" onclick="navigate('login')">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Войти
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assortment Screen -->
+            <section id="screen-assortment" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Ассортимент</h1>
+                        <p>Выберите любимые блюда</p>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Поиск блюд..." oninput="searchProducts()">
+                        <button class="search-clear" onclick="clearSearch()" style="display:none">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="search-filters">
+                        <button class="filter-chip active" data-filter="all" onclick="filterCategory('all')">Все</button>
+                        <button class="filter-chip" data-filter="Горячее" onclick="filterCategory('Горячее')">Горячее</button>
+                        <button class="filter-chip" data-filter="Салаты" onclick="filterCategory('Салаты')">Салаты</button>
+                        <button class="filter-chip" data-filter="Напитки" onclick="filterCategory('Напитки')">Напитки</button>
+                        <button class="filter-chip" data-filter="Десерты" onclick="filterCategory('Десерты')">Десерты</button>
+                    </div>
+                </div>
+
+                <div class="products-grid" id="productsGrid"></div>
+
+                <div class="empty-state" id="emptyProducts" style="display:none">
+                    <i class="fas fa-search"></i>
+                    <h3>Ничего не найдено</h3>
+                    <p>Попробуйте изменить параметры поиска</p>
+                </div>
+            </section>
+
+            <!-- Favorites Screen -->
+            <section id="screen-favorites" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Избранное</h1>
+                        <p>Ваши любимые блюда</p>
+                    </div>
+                </div>
+                <div class="favorites-grid" id="favoritesGrid"></div>
+                <div class="empty-state" id="emptyFavorites" style="display:none">
+                    <i class="fas fa-heart-broken"></i>
+                    <h3>Пока пусто</h3>
+                    <p>Добавляйте блюда в избранное</p>
+                    <button class="btn btn-primary" onclick="navigate('assortment')">
+                        <i class="fas fa-utensils"></i>
+                        Перейти в меню
+                    </button>
+                </div>
+            </section>
+
+            <!-- Profile Screen -->
+            <section id="screen-profile" class="screen">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="fas fa-user"></i>
+                        <button class="avatar-edit" onclick="editAvatar()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <h1 id="profileName">Гость</h1>
+                    <p id="profileRole">Не авторизован</p>
+                </div>
+
+                <div class="balance-card" id="balanceCard">
+                    <div class="balance-content">
+                        <div class="balance-label">Баланс</div>
+                        <div class="balance-amount" id="balanceAmount">0.00 ₴</div>
+                    </div>
+                    <button class="btn btn-sm" onclick="navigate('payment')">
+                        <i class="fas fa-plus"></i>
+                        Пополнить
+                    </button>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-card" onclick="navigate('order-history')">
+                        <div class="ac-icon"><i class="fas fa-history"></i></div>
+                        <span>История заказов</span>
+                    </button>
+                    <button class="action-card" onclick="openPromoModal()">
+                        <div class="ac-icon"><i class="fas fa-ticket-alt"></i></div>
+                        <span>Промокоды</span>
+                    </button>
+                    <button class="action-card" onclick="openSessions()">
+                        <div class="ac-icon"><i class="fas fa-laptop"></i></div>
+                        <span>Устройства</span>
+                    </button>
+                    <button class="action-card" onclick="navigate('settings')">
+                        <div class="ac-icon"><i class="fas fa-cog"></i></div>
+                        <span>Настройки</span>
+                    </button>
+                </div>
+
+                <div class="profile-section" id="profileInfoSection" style="display:none">
+                    <h2><i class="fas fa-user"></i> Личные данные</h2>
+                    <div class="info-list">
+                        <div class="info-row">
+                            <span class="info-label">ФИО</span>
+                            <span class="info-value" id="infoFullname">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Класс</span>
+                            <span class="info-value" id="infoGrade">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Возраст</span>
+                            <span class="info-value" id="infoAge">-</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="editProfile()">
+                        <i class="fas fa-edit"></i>
+                        Редактировать
+                    </button>
+                </div>
+
+                <div class="profile-section">
+                    <h2><i class="fas fa-shopping-bag"></i> Последние заказы</h2>
+                    <div class="orders-list" id="recentOrders"></div>
+                    <button class="btn btn-ghost btn-block" onclick="navigate('order-history')">
+                        Все заказы <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Meal Planner Screen -->
+            <section id="screen-meal-planner" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Планировщик питания</h1>
+                        <p>Составьте план питания на неделю</p>
+                    </div>
+                </div>
+
+                <div class="planner-container">
+                    <div class="planner-week" id="plannerWeek"></div>
+                    <div class="planner-stats">
+                        <div class="ps-item">
+                            <i class="fas fa-fire"></i>
+                            <span id="weekCalories">0</span> ккал
+                        </div>
+                        <div class="ps-item">
+                            <i class="fas fa-coins"></i>
+                            <span id="weekCost">0</span> ₴
+                        </div>
+                        <div class="ps-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span id="weekDays">0</span>/7 дней
+                        </div>
+                    </div>
+                    <div class="planner-actions">
+                        <button class="btn btn-primary" onclick="generateMealPlan()">
+                            <i class="fas fa-magic"></i>
+                            Сгенерировать
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearMealPlan()">
+                            <i class="fas fa-trash"></i>
+                            Очистить
+                        </button>
+                        <button class="btn btn-success" onclick="orderMealPlan()">
+                            <i class="fas fa-shopping-cart"></i>
+                            Заказать всё
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order History Screen -->
+            <section id="screen-order-history" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>История заказов</h1>
+                        <p>Все ваши заказы</p>
+                    </div>
+                </div>
+                <div class="orders-container" id="ordersContainer"></div>
+            </section>
+
+            <!-- Payment Screen -->
+            <section id="screen-payment" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Пополнение</h1>
+                        <p>Выберите способ оплаты</p>
+                    </div>
+                </div>
+
+                <div class="payment-container">
+                    <div class="amount-selector">
+                        <div class="as-label">Сумма пополнения</div>
+                        <div class="as-options">
+                            <button class="as-btn" data-amount="50" onclick="selectAmount(50)">50₴</button>
+                            <button class="as-btn active" data-amount="100" onclick="selectAmount(100)">100₴</button>
+                            <button class="as-btn" data-amount="200" onclick="selectAmount(200)">200₴</button>
+                            <button class="as-btn" data-amount="500" onclick="selectAmount(500)">500₴</button>
+                        </div>
+                        <div class="as-custom">
+                            <input type="number" id="customAmount" placeholder="Другая сумма" min="10" max="10000">
+                            <span>₴</span>
+                        </div>
+                    </div>
+
+                    <div class="payment-methods">
+                        <div class="pm-card" onclick="processPayment('card')">
+                            <div class="pm-icon"><i class="far fa-credit-card"></i></div>
+                            <div class="pm-info">
+                                <h3>Банковская карта</h3>
+                                <p>Комиссия 2.5%</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="pm-card" onclick="processPayment('crypto')">
+                            <div class="pm-icon"><i class="fab fa-bitcoin"></i></div>
+                            <div class="pm-info">
+                                <h3>Криптовалюта</h3>
+                                <p>Комиссия 1%</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="pm-card" onclick="processPayment('cash')">
+                            <div class="pm-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="pm-info">
+                                <h3>Наличные</h3>
+                                <p>Без комиссии • Кабинет 215</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Screen -->
+            <section id="screen-settings" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Настройки</h1>
+                        <p>Персонализация приложения</p>
+                    </div>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <i class="fas fa-palette"></i>
+                            <h3>Внешний вид</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row" onclick="toggleTheme()">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon">
+                                        <i class="fas fa-moon"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Тёмная тема</span>
+                                        <span class="setting-row-desc" id="themeStatus">Выключена</span>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch" id="themeToggle">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" onclick="openColorSchemeSelector()">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon" id="currentSchemePreview" style="background: linear-gradient(135deg, #00C896, #7C3AED);">
+                                        <i class="fas fa-palette" style="color: white;"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Цветовая схема</span>
+                                        <span class="setting-row-desc" id="currentScheme">Изумрудный</span>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right setting-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <i class="fas fa-bell"></i>
+                            <h3>Уведомления</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon" style="background: var(--success);">
+                                        <i class="fas fa-bell" style="color: white;"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Push-уведомления</span>
+                                        <span class="setting-row-desc">Получать уведомления о заказах</span>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch active">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon" style="background: var(--info);">
+                                        <i class="fas fa-envelope" style="color: white;"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Email-уведомления</span>
+                                        <span class="setting-row-desc">Отправлять на почту</span>
+                                    </div>
+                                </div>
+                                <div class="toggle-switch">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>О приложении</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row static">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon" style="background: var(--gray-300);">
+                                        <i class="fas fa-code" style="color: white;"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Версия</span>
+                                        <span class="setting-row-desc">1.0.0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row static">
+                                <div class="setting-row-left">
+                                    <div class="setting-icon" style="background: var(--secondary);">
+                                        <i class="fas fa-school" style="color: white;"></i>
+                                    </div>
+                                    <div class="setting-row-text">
+                                        <span class="setting-row-title">Организация</span>
+                                        <span class="setting-row-desc">Ришельевский лицей</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Screen -->
+            <section id="screen-admin" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Админ-панель</h1>
+                        <p>Управление системой</p>
+                    </div>
+                </div>
+
+                <div class="admin-stats" id="adminStats">
+                    <div class="stat-card">
+                        <div class="sc-icon"><i class="fas fa-users"></i></div>
+                        <div class="sc-value" id="statUsers">0</div>
+                        <div class="sc-label">Пользователей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="sc-icon"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="sc-value" id="statOrders">0</div>
+                        <div class="sc-label">Заказов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="sc-icon"><i class="fas fa-money-bill"></i></div>
+                        <div class="sc-value" id="statRevenue">0₴</div>
+                        <div class="sc-label">Выручка</div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Управление меню</h2>
+                    <button class="btn btn-primary" onclick="openProductEditor()">
+                        <i class="fas fa-plus"></i> Добавить блюдо
+                    </button>
+                    <div class="products-grid" id="adminProductsGrid"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Последние заказы</h2>
+                    <div class="admin-orders" id="adminOrders"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Рассылка уведомлений</h2>
+                    <form class="notify-form" onsubmit="sendBroadcast(event)">
+                        <input type="text" id="notifyTitle" placeholder="Заголовок" required>
+                        <textarea id="notifyMessage" placeholder="Сообщение" required></textarea>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Отправить всем
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Kitchen Screen -->
+            <section id="screen-kitchen" class="screen">
+                <div class="page-header">
+                    <div class="header-content">
+                        <h1>Панель кухни</h1>
+                        <p>Управление заказами</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="refreshKitchenOrders()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                </div>
+
+                <div class="kitchen-tabs">
+                    <button class="kitchen-tab active" data-status="pending" onclick="filterKitchenOrders('pending')">
+                        <i class="fas fa-clock"></i> Новые <span id="pendingCount">0</span>
+                    </button>
+                    <button class="kitchen-tab" data-status="cooking" onclick="filterKitchenOrders('cooking')">
+                        <i class="fas fa-fire"></i> Готовятся <span id="cookingCount">0</span>
+                    </button>
+                    <button class="kitchen-tab" data-status="ready" onclick="filterKitchenOrders('ready')">
+                        <i class="fas fa-check"></i> Готовы <span id="readyCount">0</span>
+                    </button>
+                </div>
+
+                <div class="kitchen-orders" id="kitchenOrders">
+                    <div class="kitchen-empty">
+                        <i class="fas fa-utensils"></i>
+                        <h3>Нет заказов</h3>
+                        <p>Новые заказы появятся здесь</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Success Screen -->
+            <section id="screen-success" class="screen">
+                <div class="success-container">
+                    <div class="success-icon">
+                        <div class="si-ring"></div>
+                        <div class="si-check">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h1>Заказ оформлен!</h1>
+                    <p class="success-text">Ожидайте готовность заказа в столовой</p>
+                    <div class="success-order" id="successOrder"></div>
+                    <div class="success-timer">
+                        <i class="fas fa-clock"></i>
+                        <span>Ожидание: <strong id="waitTime">15-20</strong> мин</span>
+                    </div>
+                    <div class="success-actions">
+                        <button class="btn btn-primary" onclick="navigate('assortment')">
+                            <i class="fas fa-utensils"></i>
+                            Новое меню
+                        </button>
+                        <button class="btn btn-secondary" onclick="repeatOrder()">
+                            <i class="fas fa-redo"></i>
+                            Повторить
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Корзина</h2>
+            <button class="cart-clear" onclick="clearCart()">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="cart-close" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty">
+                <i class="fas fa-shopping-bag"></i>
+                <p>Корзина пуста</p>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display:none">
+            <div class="cart-promo">
+                <input type="text" id="promoInput" placeholder="Промокод">
+                <button onclick="applyPromo()">Применить</button>
+            </div>
+            <div class="cart-summary">
+                <div class="cs-row">
+                    <span>Сумма</span>
+                    <span id="cartSubtotal">0 ₴</span>
+                </div>
+                <div class="cs-row discount" id="cartDiscountRow" style="display:none">
+                    <span>Скидка</span>
+                    <span id="cartDiscount">-0 ₴</span>
+                </div>
+                <div class="cs-row total">
+                    <span>Итого</span>
+                    <span id="cartTotal">0 ₴</span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="checkout()">
+                <i class="fas fa-check"></i>
+                Оформить заказ
+            </button>
+        </div>
+    </aside>
+
+    <!-- Notifications Panel -->
+    <aside class="notif-panel" id="notifPanel">
+        <div class="notif-header">
+            <h2>Уведомления</h2>
+            <div class="notif-header-actions">
+                <button onclick="markAllRead()" title="Все прочитаны">
+                    <i class="fas fa-check-double"></i>
+                </button>
+                <button onclick="toggleNotifications()" title="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+    </aside>
+
+    <!-- Search Modal -->
+    <div class="search-modal" id="searchModal">
+        <div class="sm-content">
+            <div class="sm-input">
+                <i class="fas fa-search"></i>
+                <input type="text" id="globalSearch" placeholder="Что ищете?" autofocus>
+                <button onclick="closeSearch()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModals()">
+        <div class="modal-box" id="modalBox" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModals()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Session Manager Modal -->
+    <div class="sessions-modal" id="sessionsModal">
+        <div class="sm-header">
+            <h2>Активные устройства</h2>
+            <button onclick="closeSessions()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sm-list" id="sessionsList"></div>
+        <div class="sm-actions">
+            <button class="btn btn-secondary" onclick="endAllSessions()">
+                <i class="fas fa-sign-out-alt"></i>
+                Выйти со всех
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toasts"></div>
+
+    <!-- Scripts -->
+    <script src="script.js" defer></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
